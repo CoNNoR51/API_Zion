@@ -1,10 +1,15 @@
 from flask import Flask, request
 from random import randint
 from param import Params
-from tower import simple_test
+from tower import start, link_change, stop
+from mininet.topo import Topo
+from mininet.net import Mininet
+from mininet.util import dumpNodeConnections
+from mininet.log import setLogLevel
 
 app = Flask(__name__)
 net_params = dict()
+net = Mininet(topo=Topo, build=False)
 
 
 @app.route('/get_id/', methods=['GET'])
@@ -18,10 +23,21 @@ def get_id():
     return {'id': id}
 
 
+@app.route('/start_net/')
+def net_start():
+    id = int(request.form['id'])
+    global net
+
+    start(id, net)
+
+    return "1"
+
+
 @app.route('/set_loss_and_delay/', methods=['POST'])
 def set_loss_and_delay():
     params = Params
     global net_params
+    global net
 
     id = int(request.form['id'])
     params.loss = float(request.form['loss'])
@@ -31,7 +47,7 @@ def set_loss_and_delay():
     net_params.update(buffer)
     print(net_params)
 
-    simple_test(id, params.loss, params.delay)
+    link_change(id, params.loss, params.delay)
 
     net_params[id].bw = net_params[id].loss
 
@@ -50,6 +66,15 @@ def get_bw():
     print()
 
     return {'bw': net_params[int(request.form['id'])].bw}
+
+@app.route('/net_stop/')
+def net_stop():
+    """Stopping network"""
+    global net
+
+    stop(net)
+
+
 
 
 if __name__ == '__main__':

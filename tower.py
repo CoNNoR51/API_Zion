@@ -4,28 +4,44 @@ from mininet.util import dumpNodeConnections
 from mininet.log import setLogLevel
 
 
-class SingleSwitchTopo(Topo):
-    "Single switch connected to n hosts."
+def start(id, net):
+    """Creating start net"""
 
-    # def build(self, n=2):
-    #     switch = self.addSwitch('s1')
-    #     # Python's range(N) generates 0..N-1
-    #     for h in range(n):
-    #         host = self.addHost('h%s' % (h + 1))
-    #         self.addLink(host, switch)
-
-
-def simple_test(id, loss, delay):
-    "Create and test a simple network"
-    topo = SingleSwitchTopo()
-    net = Mininet(topo=topo, build=False)
     switch = net.addSwitch('s1')
-    host = net.addHost('h' + str(id))
-    host1 = net.addHost('h1')
-    net.addLink(host, switch, delay=delay, loss=loss)
+    host = net.addHost('h' + str(id), ip='10.0.0.2')
+    host1 = net.addHost('h1', ip='10.0.0.1')
+    net.addLink(host, switch)
     net.addLink(host1, switch)
-    c0 = net.addController('c0')
-    cmap = {'s1': c0}
+    net.build()
+    net.start()
+    # print("Dumping host connections")
+    # dumpNodeConnections(net.hosts)
+    # print("Testing network connectivity")
+    # net.pingAll()
+
+    return net
+
+
+def link_change(id, loss, delay):
+    """Change loss & delay between userHost and towerHost (h1)"""
+
+
+
+
+def stop(net):
+    net.stop()
+
+
+def net_ping_test():
+    net = Mininet(build=False)
+    switch = net.addSwitch('s1')
+
+    host = net.addHost('h2', ip='10.0.0.2')
+    host1 = net.addHost('h1', ip='10.0.0.1')
+
+    net.addLink(host, switch)
+    net.addLink(host1, switch)
+
     net.build()
     net.start()
     print("Dumping host connections")
@@ -33,11 +49,16 @@ def simple_test(id, loss, delay):
     print("Testing network connectivity")
     net.pingAll()
 
-    # net.host.
+    h2 = net.get('h2')
+    print('+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+')
+    result = h2.cmd('ping -c 1 -q 10.0.0.1')
+
+    print(result)
+
     net.stop()
 
 
 if __name__ == '__main__':
     # Tell mininet to print useful information
     setLogLevel('info')
-    simple_test()
+    net_ping_test()

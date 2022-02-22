@@ -7,10 +7,12 @@ if __name__ == '__main__':
     convertedDict = json.loads(a.text)
     print("After conversion: ", convertedDict)
 
-    requests.post("http://127.0.0.1:5000/set_loss_and_delay/", data={'id': convertedDict['id'],
-                                                                     'loss': '12', 'delay': '33'})
+    n = requests.get('http://127.0.0.1:5000/start_net/', data={'id': convertedDict['id']})
 
-    w = requests.get('http://127.0.0.1:5000/get_bw/', data={'id': convertedDict['id']})
-
-    convertedDict1 = json.loads(w.text)
-    print("After conversion: ", convertedDict1)
+    # requests.post("http://127.0.0.1:5000/set_loss_and_delay/", data={'id': convertedDict['id'],
+    #                                                                  'loss': '12', 'delay': '33'})
+    #
+    # w = requests.get('http://127.0.0.1:5000/get_bw/', data={'id': convertedDict['id']})
+    #
+    # convertedDict1 = json.loads(w.text)
+    # print("After conversion: ", convertedDict1)
