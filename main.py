@@ -25,7 +25,7 @@ def set_loss_and_delay():
 
     id = int(request.form['id'])
     params.loss = float(request.form['loss'])
-    params.delay = float(request.form['delay'])
+    params.delay = request.form['delay'] + 'ms'
     buffer = {id: params}
 
     net_params.update(buffer)
@@ -33,7 +33,7 @@ def set_loss_and_delay():
 
     simple_test(id, params.loss, params.delay)
 
-    net_params[id].bw = net_params[id].loss + net_params[id].delay
+    net_params[id].bw = net_params[id].loss
 
     print(net_params[id].bw)
 
@@ -45,6 +45,9 @@ def get_bw():
     global net_params
 
     print(net_params[int(request.form['id'])].bw)
+
+    print('____________________________________')
+    print()
 
     return {'bw': net_params[int(request.form['id'])].bw}
 

@@ -19,7 +19,7 @@ def simple_test(id, loss, delay):
     "Create and test a simple network"
     topo = SingleSwitchTopo()
     net = Mininet(topo=topo, build=False)
-    switch = net.addSwitch('s1', params2={'ip': '172.16.0.1/12'})
+    switch = net.addSwitch('s1')
     host = net.addHost('h' + str(id))
     host1 = net.addHost('h1')
     net.addLink(host, switch, delay=delay, loss=loss)
