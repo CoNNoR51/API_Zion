@@ -1,7 +1,7 @@
 from flask import Flask, request
 from random import randint
 from param import Params
-from tower import start, link_change, stop
+from tower import start, link_change
 from mininet.topo import Topo
 from mininet.net import Mininet
 from mininet.util import dumpNodeConnections
@@ -23,7 +23,7 @@ def get_id():
     return {'id': id}
 
 
-@app.route('/start_net/')
+@app.route('/net_start/')
 def net_start():
     id = int(request.form['id'])
     global net
@@ -67,12 +67,15 @@ def get_bw():
 
     return {'bw': net_params[int(request.form['id'])].bw}
 
-@app.route('/net_stop/')
+
+@app.route('/net_stop/', methods=['GET'])
 def net_stop():
     """Stopping network"""
     global net
 
-    stop(net)
+    net.stop()
+
+    return "1"
 
 
 

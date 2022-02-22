@@ -28,10 +28,6 @@ def link_change(id, loss, delay):
 
 
 
-def stop(net):
-    net.stop()
-
-
 def net_ping_test():
     net = Mininet(build=False)
     switch = net.addSwitch('s1')

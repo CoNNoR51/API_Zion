@@ -7,7 +7,9 @@ if __name__ == '__main__':
     convertedDict = json.loads(a.text)
     print("After conversion: ", convertedDict)
 
-    n = requests.get('http://127.0.0.1:5000/start_net/', data={'id': convertedDict['id']})
+    n = requests.get('http://127.0.0.1:5000/net_start/', data={'id': convertedDict['id']})
+
+    requests.get('http://127.0.0.1:5000/net_stop/')
 
     # requests.post("http://127.0.0.1:5000/set_loss_and_delay/", data={'id': convertedDict['id'],
     #                                                                  'loss': '12', 'delay': '33'})
