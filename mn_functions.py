@@ -1,5 +1,4 @@
 from mininet.link import TCLink
-from mininet.topo import Topo
 from mininet.net import Mininet
 from mininet.util import dumpNodeConnections
 from mininet.log import setLogLevel
@@ -15,23 +14,50 @@ def start(id, net):
     cmap = {'s1': c0}
 
     net.addLink(host1, switch)
-    net.addLink(host, switch, delay='70ms')
+    net.addLink(host, switch)
 
     net.build()
     net.start()
-    # print("Dumping host connections")
-    # dumpNodeConnections(net.hosts)
-    # print("Testing network connectivity")
-    # net.pingAll()
 
 
-def link_change(net, id, loss, delay):
+def link_change_mn(net, id, loss, delay):
     """Change loss & delay between userHost and towerHost (h1)"""
 
-    net.delLinkBetween()
+    net.delLinkBetween(net.get('h' + str(id)), net.get('s1'), allLinks=True)
+    net.addLink(net.get('h' + str(id)), net.get('s1'),
+                loss=loss, delay=delay)
+    net.build()
 
 
+def get_speed_mn(net, id):
+    buf = ''
+    write = False
 
+    host = net.get('h' + str(id))
+
+    result = host.cmd('ping -c 1 -q 10.0.0.1')
+    print(result)
+
+    for char in result:
+        if char == '/':
+            write = False
+
+        if write:
+            buf += char
+
+        if char == '=':
+            write = True
+
+    print(buf)
+
+    if buf == '':
+        speed = 0
+    else:
+        time_for_pkg = float(buf)
+        print(buf)
+        speed = 0.4375 / (time_for_pkg / 1000)
+
+    return speed
 
 
 def net_ping_test():
