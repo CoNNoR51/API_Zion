@@ -47,11 +47,11 @@ def net_ping_test():
     print("Testing network connectivity")
     net.pingAll()
 
-    # h2 = net.get('h2')
-    # print('+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+')
-    # result = h2.cmd('ping -c 1 -q 10.0.0.1')
-    # 
-    # print(result)
+    h2 = net.get('h2')
+    print('+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+')
+    result = h2.cmd('ping -c 1 -q 10.0.0.1')
+
+    print(result)
 
     net.stop()
 

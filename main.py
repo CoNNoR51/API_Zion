@@ -59,11 +59,27 @@ def link_change():
 def get_speed():
     global net_params
     global net
+    buf = ''
+    write = False
 
-    print(net_params[int(request.form['id'])].speed)
+    h2 = net.get('h2')
 
-    print('____________________________________')
-    print()
+    result = h2.cmd('ping -c 1 -q 10.0.0.1')
+
+    for char in result:
+        if char == '/':
+            write = False
+
+        if write:
+            buf += char
+
+        if char == '=':
+            write = True
+
+    time_for_pkg = float(buf)
+
+
+
 
     return {'bw': net_params[int(request.form['id'])].speed}
 
