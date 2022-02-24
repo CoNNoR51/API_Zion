@@ -1,16 +1,8 @@
+from mininet.link import TCLink
 from mininet.topo import Topo
 from mininet.net import Mininet
 from mininet.util import dumpNodeConnections
 from mininet.log import setLogLevel
-
-
-class SingleSwitchTopo(Topo):
-    "Single switch connected to n hosts."
-
-    def build(self):
-        switch = self.addSwitch('s1')
-        host = self.addHost('h1', ip='10.0.0.1')
-        self.addLink(host, switch)
 
 
 def start(id, net):
@@ -23,14 +15,14 @@ def start(id, net):
     cmap = {'s1': c0}
 
     net.addLink(host1, switch)
-    net.addLink(host, switch)
+    net.addLink(host, switch, delay='70ms')
 
     net.build()
     net.start()
     # print("Dumping host connections")
     # dumpNodeConnections(net.hosts)
-    print("Testing network connectivity")
-    net.pingAll()
+    # print("Testing network connectivity")
+    # net.pingAll()
 
 
 def link_change(net, id, loss, delay):
@@ -44,7 +36,7 @@ def link_change(net, id, loss, delay):
 
 def net_ping_test():
     # topo = SingleSwitchTopo()
-    net = Mininet(build=False)
+    net = Mininet(link=TCLink, build=False)
 
     switch = net.addSwitch('s1')
 
@@ -53,7 +45,7 @@ def net_ping_test():
     c0 = net.addController('c0')
     cmap = {'s1': c0}
 
-    net.addLink(host, switch)
+    net.addLink(host, switch, delay='90ms')
     net.addLink(host1, switch)
     net.build()
     net.start()

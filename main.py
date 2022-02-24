@@ -1,8 +1,8 @@
 from flask import Flask, request
 from random import randint
+from mininet.link import TCLink
 from param import Params
-from mn_functions import start, SingleSwitchTopo
-from mininet.topo import Topo
+from mn_functions import start
 from mininet.net import Mininet
 from mininet.log import setLogLevel
 import logging
@@ -11,7 +11,7 @@ app = Flask(__name__)
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 net_params = dict()
-net = Mininet(build=False)
+net = Mininet(link=TCLink, build=False)
 
 
 @app.route('/get_id/', methods=['GET'])
@@ -49,11 +49,10 @@ def link_change():
     net_params.update(buffer)
     print(net_params)
 
-    # link_change(id, params.loss, params.delay)
-
     net.delLinkBetween(net.get('h' + str(id)), net.get('s1'), allLinks=True)
     net.addLink(net.get('h' + str(id)), net.get('s1'),
                 loss=net_params[id].loss, delay=net_params[id].delay)
+    net.build()
 
     return "1"
 
@@ -81,13 +80,16 @@ def get_speed():
         if char == '=':
             write = True
 
+    print(buf)
+
     if buf == '':
         net_params[id].speed = 0
     else:
         time_for_pkg = float(buf)
+        print(buf)
         net_params[id].speed = 0.4375 / (time_for_pkg / 1000)
 
-    return {'bw': net_params[id].speed}
+    return {'speed': net_params[id].speed}
 
 
 @app.route('/net_stop/', methods=['GET'])
@@ -96,9 +98,11 @@ def net_stop():
     global net
 
     net.stop()
+    print('net stopped')
 
     return "1"
 
 
 if __name__ == '__main__':
+    setLogLevel('info')
     app.run()
