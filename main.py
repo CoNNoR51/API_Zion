@@ -61,10 +61,12 @@ def get_speed():
     global net
     buf = ''
     write = False
+    id = int(request.form['id'])
 
-    h2 = net.get('h2')
+    host = net.get('h'+str(id))
 
-    result = h2.cmd('ping -c 1 -q 10.0.0.1')
+    result = host.cmd('ping -c 1 -q 10.0.0.1')
+    print(result)
 
     for char in result:
         if char == '/':
@@ -76,12 +78,13 @@ def get_speed():
         if char == '=':
             write = True
 
-    time_for_pkg = float(buf)
+    if buf == '':
+        net_params[id].speed = 0
+    else:
+        time_for_pkg = float(buf)
+        net_params[id].speed = 0.4375 / (time_for_pkg / 1000)
 
-
-
-
-    return {'bw': net_params[int(request.form['id'])].speed}
+    return {'bw': net_params[id].speed}
 
 
 @app.route('/net_stop/', methods=['GET'])
