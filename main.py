@@ -1,14 +1,17 @@
 from flask import Flask, request
 from random import randint
 from param import Params
-from tower import start, link_change
+from mn_functions import start, SingleSwitchTopo
 from mininet.topo import Topo
 from mininet.net import Mininet
 from mininet.log import setLogLevel
+import logging
 
 app = Flask(__name__)
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 net_params = dict()
-net = Mininet()
+net = Mininet(build=False)
 
 
 @app.route('/get_id/', methods=['GET'])
@@ -24,8 +27,8 @@ def get_id():
 
 @app.route('/net_start/', methods=['GET'])
 def net_start():
-    id = int(request.form['id'])
     global net
+    id = int(request.form['id'])
 
     start(id, net)
 
@@ -48,8 +51,8 @@ def link_change():
 
     # link_change(id, params.loss, params.delay)
 
-    net.delLinkBetween(net.get('h'+str(id)), net.get('s1'), allLinks=True)
-    net.addLink(net.get('h'+str(id)), net.get('s1'),
+    net.delLinkBetween(net.get('h' + str(id)), net.get('s1'), allLinks=True)
+    net.addLink(net.get('h' + str(id)), net.get('s1'),
                 loss=net_params[id].loss, delay=net_params[id].delay)
 
     return "1"
@@ -63,7 +66,7 @@ def get_speed():
     write = False
     id = int(request.form['id'])
 
-    host = net.get('h'+str(id))
+    host = net.get('h' + str(id))
 
     result = host.cmd('ping -c 1 -q 10.0.0.1')
     print(result)
