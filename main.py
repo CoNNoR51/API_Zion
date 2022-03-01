@@ -16,7 +16,7 @@ net_params = dict()
 net = Mininet(link=TCLink, switch=OVSSwitch, build=False)
 
 switch = net.addSwitch('s1', action='NORMAL')
-
+switch.intfList()
 
 
 @app.route('/net_start/', methods=['GET'])

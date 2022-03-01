@@ -25,11 +25,12 @@ def host_up_mn(net, id):
     switch = net.get('s1')
 
     host = net.addHost('h' + str(id), ip='10.0.0.2')
-
-
+    net.addLink(host, switch)
     switch.setHostRoute('10.0.0.2', 'eth3')
     switch.attach('eth3')
-    net.addLink(host, switch)
+    switch.configDefault(action='NORMAL')
+    print(switch.intfList())
+
 
     net.build()
 
