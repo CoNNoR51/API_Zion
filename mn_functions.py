@@ -7,17 +7,42 @@ from mininet.log import setLogLevel
 def start(id, net):
     """Creating start net"""
     switch = net.addSwitch('s1')
+    switch.configDefault(action='NORMAL')
 
     host1 = net.addHost('h1', ip='10.0.0.1')
-    host = net.addHost('h' + str(id), ip='10.0.0.2')
+    host2 = net.addHost('h2', ip='10.0.0.3')
     c0 = net.addController('c0')
     cmap = {'s1': c0}
 
-    net.addLink(host1, switch)
-    net.addLink(host, switch)
+    net.addLink(host1, switch, loss=0, delay='2ms')
+    net.addLink(host2, switch, loss=0, delay='2ms')
 
     net.build()
     net.start()
+
+
+def host_up_mn(net, id):
+    switch = net.get('s1')
+
+    host = net.addHost('h' + str(id), ip='10.0.0.2')
+
+
+    switch.setHostRoute('10.0.0.2', 'eth3')
+    switch.attach('eth3')
+    net.addLink(host, switch)
+
+    net.build()
+
+    dumpNodeConnections(net.hosts)
+    # net.pingAll()
+
+
+def host_down_mn(net, id):
+
+    net.delLinkBetween(net.get('h' + str(id)), net.get('s1'), allLinks=True)
+    net.delHost(net.get('h' + str(id)))
+
+    net.build()
 
 
 def link_change_mn(net, id, loss, delay):
@@ -26,6 +51,10 @@ def link_change_mn(net, id, loss, delay):
     net.delLinkBetween(net.get('h' + str(id)), net.get('s1'), allLinks=True)
     net.addLink(net.get('h' + str(id)), net.get('s1'),
                 loss=loss, delay=delay)
+
+    # net.delLinkBetween(net.get('h2'), net.get('s1'), allLinks=True)
+    # net.addLink(net.get('h2'), net.get('s1'), loss=loss, delay=delay)
+
     net.build()
 
 
@@ -34,6 +63,7 @@ def get_speed_mn(net, id):
     write = False
 
     host = net.get('h' + str(id))
+    # host = net.get('h2')
 
     result = host.cmd('ping -c 1 -q 10.0.0.1')
     print(result)
@@ -56,6 +86,8 @@ def get_speed_mn(net, id):
         time_for_pkg = float(buf)
         print(buf)
         speed = 0.4375 / (time_for_pkg / 1000)
+
+    print('speed = ' + str(speed) + ' Kbit/s')
 
     return speed
 

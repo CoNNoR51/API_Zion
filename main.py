@@ -1,8 +1,10 @@
 from flask import Flask, request
 from random import randint
 from mininet.link import TCLink
+from mininet.node import OVSSwitch
+
 from param import Params
-from mn_functions import start, link_change_mn, get_speed_mn
+from mn_functions import start, link_change_mn, get_speed_mn, host_up_mn, host_down_mn
 from mininet.net import Mininet
 from mininet.log import setLogLevel
 import logging
@@ -11,7 +13,20 @@ app = Flask(__name__)
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 net_params = dict()
-net = Mininet(link=TCLink, build=False)
+net = Mininet(link=TCLink, switch=OVSSwitch, build=False)
+
+switch = net.addSwitch('s1', action='NORMAL')
+
+
+
+@app.route('/net_start/', methods=['GET'])
+def net_start():
+    global net
+    id = int(request.form['id'])
+
+    start(id, net)
+
+    return "1"
 
 
 @app.route('/get_id/', methods=['GET'])
@@ -27,12 +42,22 @@ def get_id():
     return {'id': id}
 
 
-@app.route('/net_start/', methods=['GET'])
-def net_start():
+@app.route('/host_up/', methods=['GET'])
+def host_up():
     global net
     id = int(request.form['id'])
 
-    start(id, net)
+    host_up_mn(net, id)
+
+    return "1"
+
+
+@app.route('/host_down/', methods=['GET'])
+def host_down():
+    global net
+    id = int(request.form['id'])
+
+    host_down_mn(net, id)
 
     return "1"
 
@@ -49,9 +74,9 @@ def link_change():
     buffer = {id: params}
 
     net_params.update(buffer)
-    print(net_params)
 
     link_change_mn(net, id, net_params[id].loss, net_params[id].delay)
+    # link_change_mn(net, id, float(request.form['loss']), request.form['delay'] + 'ms')
 
     return "1"
 
@@ -63,9 +88,12 @@ def get_speed():
 
     id = int(request.form['id'])
 
+    # get_speed_mn(net, id)
+
     net_params[id].speed = get_speed_mn(net, id)
 
     return {'speed': net_params[id].speed}
+    # return '1'
 
 
 @app.route('/net_stop/', methods=['GET'])
@@ -74,7 +102,6 @@ def net_stop():
     global net
 
     net.stop()
-    print('net stopped')
 
     return "1"
 
